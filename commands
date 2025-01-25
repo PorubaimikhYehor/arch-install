@@ -1,0 +1,44 @@
+sudo -i
+mount /dev/sda2 /mnt/
+btrfs subvolume create /mnt/@arch
+btrfs subvolume create /mnt/@arch/@
+btrfs subvolume create /mnt/@arch/@home
+btrfs subvolume create /mnt/@arch/@opt
+sudo umount /mnt
+sudo mount /dev//sda2 /mnt/ -o subvol=@arch/@
+mkdir /mnt/home
+mkdir /mnt/opt
+mkdir /mnt/boot
+sudo mount /dev/sda2 /mnt/home -o subvol=@arch/@home
+sudo mount /dev/sda2 /mnt/opt -o subvol=@arch/@opt
+sudo mount /dev/sda4 /mnt/boot
+pacstrap -K /mnt base linux linux-firmware
+dnf install arch-install-scripts
+pacstrap -K /mnt base linux linux-firmware
+genfstab -U /mnt >> /mnt/etc/fstab
+arch-chroot /mnt
+ln -sf /usr/share/zoneinfo/Europe/Kyiv /etc/localtime
+hwclock --systohc
+pacman -S vim
+vim /etc/locale.gen 
+# uncomment en_US.UTF-8 UTF-8
+locale-gen
+vim /etc/locale.conf
+#add LANG=en_US.UTF-8
+vim /etc/hostname
+# add hostname
+passwd
+# set root password
+
+vim /etc/fstab 
+#comment line /dev/zram0
+
+vim /etc/pacman.conf
+# uncomment ParallelDownloads = 5
+
+pacman -S grub efibootmgr
+grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
+
+pacman -S  networkmanager
+pacman -S networkmanager-openvpn
+
